@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+/* Padrão Visual Dipães — tokens (tema claro) */
+:root {
+  --background: #f6f5f3;
+  --foreground: #2f3033;
+  --card: #ffffff;
+  --card-foreground: #2f3033;
+  --primary: #f17b3e;
+  --primary-hover: #d95f25;
+  --primary-foreground: #ffffff;
+  --secondary: #ffffff;
+  --secondary-foreground: #2f3033;
+  --muted: #f0eeeb;
+  --muted-foreground: #73757a;
+  --accent: #fdf3ec;
+  --accent-foreground: #f17b3e;
+  --surface-subtle: #faf9f7;
+  --border: #e7e3df;
+  --border-strong: #d4d2cd;
+  --input: #e7e3df;
+  --ring: #f17b3e;
+  --destructive: #dc2626;
+  --success: #047857;
+  --success-bg: #ecfdf5;
+  --success-border: #a7f3d0;
+  --success-solid: #059669;
+  --warning: #b45309;
+  --warning-bg: #fffbeb;
+  --warning-border: #fde68a;
+  --info: #1d4ed8;
+  --info-bg: #eff6ff;
+  --info-border: #bfdbfe;
+  --login-gradient-from: #f39863;
+  --login-gradient-to: #dc642c;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-success-border: var(--success-border);
+  --color-success-solid: var(--success-solid);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-border: var(--warning-border);
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
+  --color-info-border: var(--info-border);
+  --color-login-from: var(--login-gradient-from);
+  --color-login-to: var(--login-gradient-to);
+
+  --font-heading: "Dosis", sans-serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-field: 16px;
+}
+
+@layer base {
+  * { border-color: var(--border); }
+  html, body, #root { min-height: 100%; }
+  body {
+    margin: 0;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 20px;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: var(--font-heading); }
+}
+
+@utility eyebrow {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+@utility page-title {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+@utility stat-value {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+}
+
+@utility font-hand {
+  font-family: "Kalam", "Segoe Print", cursive;
+}
