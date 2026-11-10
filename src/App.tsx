@@ -55,20 +55,21 @@ function Conteudo() {
     )
   if (usuario.precisa_trocar_senha) return <TrocarSenhaPage />
 
-  const frota = usuario.perfil === 'frota' || usuario.perfil === 'admin'
+  const painel = usuario.perfil !== 'motorista'
+  const edita = usuario.perfil === 'frota' || usuario.perfil === 'admin'
   return (
-    <Roteador inicio={frota ? '/hoje' : '/'}>
+    <Roteador inicio={painel ? '/hoje' : '/'}>
       <Routes>
-        {frota ? (
+        {painel ? (
           <Route element={<AppLayout />}>
             <Route path="/hoje" element={<HojePage />} />
             <Route path="/checklists/:id" element={<ChecklistDetalhePage />} />
             <Route path="/pendencias" element={<PendenciasPage />} />
             <Route path="/historico" element={<HistoricoPage />} />
-            <Route path="/veiculos" element={<VeiculosPage />} />
-            <Route path="/itens" element={<ItensPage />} />
-            {usuario.perfil === 'admin' && <Route path="/usuarios" element={<UsuariosPage />} />}
-            <Route path="/papel/:veiculoId" element={<ChecklistPage papel />} />
+            {edita && <Route path="/veiculos" element={<VeiculosPage />} />}
+            {edita && <Route path="/itens" element={<ItensPage />} />}
+            {edita && <Route path="/usuarios" element={<UsuariosPage />} />}
+            {edita && <Route path="/papel/:veiculoId" element={<ChecklistPage papel />} />}
             <Route path="*" element={<Navigate to="/hoje" replace />} />
           </Route>
         ) : (

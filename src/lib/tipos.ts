@@ -1,4 +1,4 @@
-export type Perfil = 'motorista' | 'frota' | 'admin'
+export type Perfil = 'motorista' | 'frota' | 'gestor' | 'admin'
 export type Situacao = 'ativo' | 'afastado' | 'desligado'
 export type TipoVeiculo = 'bau' | 'frigorifico' | 'leve'
 export type Resposta = 'ok' | 'nok'
@@ -179,7 +179,15 @@ export interface RetornoEnvio {
 }
 
 export const TIPO_LABEL: Record<TipoVeiculo, string> = { bau: 'Caminhão baú', frigorifico: 'Caminhão frigorífico', leve: 'Carro leve' }
-export const PERFIL_LABEL: Record<Perfil, string> = { motorista: 'Motorista', frota: 'Frota', admin: 'Administrador' }
+export const PERFIL_LABEL: Record<Perfil, string> = { motorista: 'Motorista', frota: 'Frota', gestor: 'Gestor', admin: 'Administrador' }
+export const PERFIL_AJUDA: Record<Perfil, string> = {
+  motorista: 'Faz o checklist no celular.',
+  frota: 'Libera veículos, cuida das pendências e cadastra motoristas.',
+  gestor: 'Acompanha checklists, pendências e o 5W2H. Não altera nada.',
+  admin: 'Tudo da Frota, mais gestores, usuários Frota e administradores.',
+}
+/** Perfis que podem alterar dados no painel (o gestor só acompanha). */
+export const podeEditar = (p: Perfil | undefined | null) => p === 'frota' || p === 'admin'
 export const SITUACAO_LABEL: Record<Situacao, string> = { ativo: 'Ativo', afastado: 'Afastado', desligado: 'Desligado' }
 export const STATUS_LABEL: Record<StatusPendencia, string> = {
   nao_iniciada: 'Não iniciada',

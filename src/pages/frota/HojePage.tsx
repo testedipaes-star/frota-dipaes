@@ -6,7 +6,8 @@ import { Aviso, Dialog, Input, PageHeader, StatCard, Vazio } from '@/components/
 import { ResultadoBadge } from '@/components/status'
 import { IconeTipo } from '@/pages/motorista/InicioPage'
 import { lerConfig, listarVeiculos, painelDia } from '@/lib/api'
-import { TIPO_LABEL, type LinhaPainel, type Veiculo } from '@/lib/tipos'
+import { podeEditar, TIPO_LABEL, type LinhaPainel, type Veiculo } from '@/lib/tipos'
+import { useSessao } from '@/lib/sessao'
 import { cn, dataBR, duracao, hojeSP, horaBR, km, placaBR } from '@/lib/utils'
 
 export default function HojePage() {
@@ -18,6 +19,7 @@ export default function HojePage() {
   const [papel, setPapel] = useState(false)
   const [veiculos, setVeiculos] = useState<Veiculo[]>([])
   const navigate = useNavigate()
+  const edita = podeEditar(useSessao().usuario?.perfil)
 
   const carregar = useCallback(async () => {
     setErro('')
@@ -56,9 +58,11 @@ export default function HojePage() {
             <Button variant="outline" onClick={carregar}>
               <RefreshCw /> Atualizar
             </Button>
-            <Button variant="outline" onClick={async () => (setVeiculos(await listarVeiculos(true)), setPapel(true))}>
-              <FileText /> Lançar folha de papel
-            </Button>
+            {edita && (
+              <Button variant="outline" onClick={async () => (setVeiculos(await listarVeiculos(true)), setPapel(true))}>
+                <FileText /> Lançar folha de papel
+              </Button>
+            )}
           </>
         }
       />
@@ -72,7 +76,8 @@ export default function HojePage() {
 
       {bloqueados.length > 0 && (
         <Aviso tom="destructive">
-          <b>{bloqueados.length === 1 ? '1 veículo aguarda' : `${bloqueados.length} veículos aguardam`} a liberação da Frota.</b> Abra o checklist, veja as fotos e libere ou mantenha bloqueado.
+          <b>{bloqueados.length === 1 ? '1 veículo aguarda' : `${bloqueados.length} veículos aguardam`} a liberação da Frota.</b>{' '}
+          {edita ? 'Abra o checklist, veja as fotos e libere ou mantenha bloqueado.' : 'A liberação é feita pela Frota.'}
         </Aviso>
       )}
       {erro && <Aviso tom="destructive">{erro}</Aviso>}

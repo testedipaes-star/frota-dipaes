@@ -17,6 +17,7 @@ const agoraMenos = (min: number) => new Date(Date.now() - min * 60000).toISOStri
 const usuarios: Usuario[] = [
   { id: 'u-adm', auth_user_id: 'a-adm', nome: 'Mauro Bom Junior', cpf: null, login: 'admin', perfil: 'admin', situacao: 'ativo', telefone: null, precisa_trocar_senha: false },
   { id: 'u-frota', auth_user_id: 'a-frota', nome: 'Responsável Frota', cpf: '52998224725', login: null, perfil: 'frota', situacao: 'ativo', telefone: null, precisa_trocar_senha: false },
+  { id: 'u-gestor', auth_user_id: 'a-gestor', nome: 'Gestor Logística', cpf: '15350946056', login: null, perfil: 'gestor', situacao: 'ativo', telefone: null, precisa_trocar_senha: false },
   { id: 'u-douglas', auth_user_id: 'a-douglas', nome: 'Douglas Alexandre', cpf: '11144477735', login: null, perfil: 'motorista', situacao: 'ativo', telefone: null, precisa_trocar_senha: false },
   { id: 'u-creonti', auth_user_id: 'a-creonti', nome: 'Creonti Maximo', cpf: '39053344705', login: null, perfil: 'motorista', situacao: 'ativo', telefone: null, precisa_trocar_senha: false },
 ]
@@ -49,7 +50,7 @@ const FOTO_EXEMPLO =
 
 const eu = () => {
   const p = perfilDemo()
-  return p === 'motorista' ? usuarios[2] : p === 'frota' ? usuarios[0] : null
+  return p === 'motorista' ? usuarios.find((u) => u.id === 'u-douglas')! : p === 'frota' ? usuarios[0] : p === 'gestor' ? usuarios.find((u) => u.id === 'u-gestor')! : null
 }
 const nomeDe = (id: string | null) => usuarios.find((u) => u.id === id)?.nome ?? null
 const comJoins = (c: Checklist): Checklist => ({
@@ -229,8 +230,12 @@ export const demo: Api = {
     else usuarios.push({ id: uuid(), auth_user_id: null, nome: dados.nome, cpf: dados.cpf?.replace(/\D/g, '') || null, login: null, perfil: dados.perfil as Usuario['perfil'], situacao: 'ativo', telefone: null, precisa_trocar_senha: true })
     return id ?? ''
   },
-  async gerarAcesso() {
-    return { login: '111.444.777-35', senha: 'pneu-4821' }
+  async gerarAcesso(id) {
+    const u = usuarios.find((x) => x.id === id)!
+    u.auth_user_id = u.auth_user_id ?? 'a-' + u.id
+    u.precisa_trocar_senha = true
+    const c = u.cpf ?? ''
+    return { login: c ? `${c.slice(0, 3)}.${c.slice(3, 6)}.${c.slice(6, 9)}-${c.slice(9)}` : u.login ?? '', senha: `rota-${1000 + Math.floor(Math.random() * 9000)}` }
   },
   async lerConfig() {
     return { plano: { ...plano }, regras: { ...regras } }

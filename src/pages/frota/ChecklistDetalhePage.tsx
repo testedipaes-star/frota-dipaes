@@ -5,12 +5,14 @@ import { Button } from '@/components/ui/button'
 import { Aviso, Card, Dialog, Field } from '@/components/ui/misc'
 import { ResultadoBadge } from '@/components/status'
 import { checklistDetalhe, lerConfig, liberarChecklist } from '@/lib/api'
-import { TIPO_LABEL, type Checklist, type Foto, type RespostaGravada } from '@/lib/tipos'
+import { podeEditar, TIPO_LABEL, type Checklist, type Foto, type RespostaGravada } from '@/lib/tipos'
+import { useSessao } from '@/lib/sessao'
 import { cn, dataBR, dataHoraBR, duracao, horaBR, km, placaBR } from '@/lib/utils'
 
 export default function ChecklistDetalhePage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const edita = podeEditar(useSessao().usuario?.perfil)
   const [c, setC] = useState<Checklist | null>(null)
   const [respostas, setRespostas] = useState<RespostaGravada[]>([])
   const [fotos, setFotos] = useState<Foto[]>([])
@@ -103,6 +105,8 @@ export default function ChecklistDetalhePage() {
                 {c.qtd_nok_critico} item{c.qtd_nok_critico > 1 ? 's' : ''} crítico{c.qtd_nok_critico > 1 ? 's' : ''} com NOK. Veja as fotos abaixo antes de decidir.
               </p>
               {c.liberacao === 'mantido_bloqueado' && <p className="mt-1 text-sm text-muted-foreground">Última decisão: {c.obs_liberacao} ({c.liberador?.nome}, {dataHoraBR(c.liberado_em)})</p>}
+              {!edita && <p className="mt-2 text-sm text-muted-foreground">A liberação é feita pela Frota.</p>}
+              {edita && (
               <div className="mt-3 flex flex-col gap-3">
                 <Field label="Observação da Frota (obrigatória)">
                   <textarea
@@ -124,6 +128,7 @@ export default function ChecklistDetalhePage() {
                   )}
                 </div>
               </div>
+              )}
             </div>
           </div>
         </Card>

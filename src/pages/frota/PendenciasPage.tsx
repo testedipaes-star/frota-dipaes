@@ -10,7 +10,7 @@ import {
 } from '@/lib/api'
 import { exportar5W2H } from '@/lib/excel'
 import { useSessao } from '@/lib/sessao'
-import { ABERTAS, STATUS_LABEL, type ConfigPlano, type EventoPendencia, type NotaTipo, type Pendencia, type StatusPendencia, type Veiculo } from '@/lib/tipos'
+import { ABERTAS, podeEditar, STATUS_LABEL, type ConfigPlano, type EventoPendencia, type NotaTipo, type Pendencia, type StatusPendencia, type Veiculo } from '@/lib/tipos'
 import { cn, dataBR, dataHoraBR, diaMes, diasEntre, hojeSP, placaBR, somarDias } from '@/lib/utils'
 
 const LANES: { id: StatusPendencia; hint: string }[] = [
@@ -29,6 +29,7 @@ const corPostit = (p: Pendencia) => (p.critico ? 'bg-[#ff9fcf]' : p.item_id ? 'b
 
 export default function PendenciasPage() {
   const hoje = hojeSP()
+  const edita = podeEditar(useSessao().usuario?.perfil)
   const [lista, setLista] = useState<Pendencia[]>([])
   const [notas, setNotas] = useState<EventoPendencia[]>([])
   const [veiculos, setVeiculos] = useState<Veiculo[]>([])
@@ -81,7 +82,7 @@ export default function PendenciasPage() {
   const ultimaNota = (id: string) => notas.filter((n) => n.pendencia_id === id).at(-1)
 
   async function moverPara(p: Pendencia, para: StatusPendencia) {
-    if (p.status === para) return
+    if (!edita || p.status === para) return
     if (para === 'concluida' || para === 'standby' || para === 'cancelada') return setMover({ p, para })
     await salvarPendencia(p.id, { status: para })
     await carregar()
@@ -118,15 +119,19 @@ export default function PendenciasPage() {
                 </button>
               ))}
             </div>
-            <Button variant="outline" onClick={() => setAjustes(true)}>
-              <Settings2 /> Ajustes
-            </Button>
+            {edita && (
+              <Button variant="outline" onClick={() => setAjustes(true)}>
+                <Settings2 /> Ajustes
+              </Button>
+            )}
             <Button variant="outline" onClick={() => setExportar(true)} disabled={!lista.length}>
               <Download /> Exportar Excel 5W2H
             </Button>
-            <Button onClick={() => setNova(true)}>
-              <Plus /> Nova pendência
-            </Button>
+            {edita && (
+              <Button onClick={() => setNova(true)}>
+                <Plus /> Nova pendência
+              </Button>
+            )}
           </>
         }
       />
@@ -170,7 +175,7 @@ export default function PendenciasPage() {
             return (
               <section
                 key={l.id}
-                onDragOver={(e) => (e.preventDefault(), setSobre(l.id))}
+                onDragOver={(e) => edita && (e.preventDefault(), setSobre(l.id))}
                 onDragLeave={() => setSobre((s) => (s === l.id ? null : s))}
                 onDrop={(e) => soltar(e, l.id)}
                 className={cn(
@@ -194,7 +199,7 @@ export default function PendenciasPage() {
                       return (
                         <article
                           key={p.id}
-                          draggable
+                          draggable={edita}
                           onDragStart={() => setArrastando(p.id)}
                           onDragEnd={() => (setArrastando(null), setSobre(null))}
                           onClick={() => setAberta(p)}
@@ -230,7 +235,7 @@ export default function PendenciasPage() {
                         </article>
                       )
                     })}
-                    {!doLane.length && <div className="rounded-lg border border-dashed border-border-strong px-2 py-6 text-center text-xs text-muted-foreground">Arraste um post-it para cá.</div>}
+                    {!doLane.length && <div className="rounded-lg border border-dashed border-border-strong px-2 py-6 text-center text-xs text-muted-foreground">{edita ? 'Arraste um post-it para cá.' : 'Nenhuma pendência.'}</div>}
                   </div>
                 )}
               </section>
@@ -282,7 +287,7 @@ export default function PendenciasPage() {
         </Table>
       )}
 
-      {aberta && <EditorPendencia p={aberta} onFechar={() => setAberta(null)} onMudou={carregar} onMover={(para) => moverPara(aberta, para)} />}
+      {aberta && <EditorPendencia p={aberta} edita={edita} onFechar={() => setAberta(null)} onMudou={carregar} onMover={(para) => moverPara(aberta, para)} />}
       {mover && (
         <DialogMover
           {...mover}
@@ -308,12 +313,12 @@ function Area({ value, onChange, placeholder, linhas = 2 }: { value: string; onC
       value={value}
       placeholder={placeholder}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+      className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:bg-muted disabled:text-foreground"
     />
   )
 }
 
-function EditorPendencia({ p, onFechar, onMudou, onMover }: { p: Pendencia; onFechar: () => void; onMudou: () => Promise<void>; onMover: (s: StatusPendencia) => void }) {
+function EditorPendencia({ p, edita, onFechar, onMudou, onMover }: { p: Pendencia; edita: boolean; onFechar: () => void; onMudou: () => Promise<void>; onMover: (s: StatusPendencia) => void }) {
   const navigate = useNavigate()
   const [f, setF] = useState({ oque: p.oque, porque: p.porque ?? '', responsavel: p.responsavel ?? '', envolvidos: p.envolvidos ?? '', onde: p.onde ?? '', como: p.como ?? '', quanto: p.quanto ?? '', prazo: p.prazo ?? '' })
   const [eventos, setEventos] = useState<EventoPendencia[]>([])
@@ -378,8 +383,9 @@ function EditorPendencia({ p, onFechar, onMudou, onMover }: { p: Pendencia; onFe
           {LANES.map((l) => (
             <button
               key={l.id}
+              disabled={!edita}
               onClick={() => onMover(l.id)}
-              className={cn('h-8 rounded-full border px-3 text-xs font-semibold', p.status === l.id ? 'border-primary bg-primary text-white' : 'border-border bg-card hover:border-primary')}
+              className={cn('h-8 rounded-full border px-3 text-xs font-semibold disabled:cursor-default', p.status === l.id ? 'border-primary bg-primary text-white' : 'border-border bg-card enabled:hover:border-primary disabled:opacity-50')}
             >
               {STATUS_LABEL[l.id]}
             </button>
@@ -392,7 +398,8 @@ function EditorPendencia({ p, onFechar, onMudou, onMover }: { p: Pendencia; onFe
         </div>
         {p.ocorrencias > 1 && <Aviso tom="warning">Apontado {p.ocorrencias} vezes · última em {dataBR(p.ultima_ocorrencia)}</Aviso>}
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {!edita && <Aviso tom="info">Você acompanha esta pendência. Quem altera é a Frota.</Aviso>}
+        <fieldset disabled={!edita} className="grid grid-cols-1 gap-4 disabled:opacity-90 sm:grid-cols-2">
           <div className="sm:col-span-2">{campo('oque', 'O que fazer? (ação)', '', 2)}</div>
           <div className="sm:col-span-2">{campo('porque', 'Por que? (motivo)', '', 2)}</div>
           {campo('responsavel', 'Quem? Responsável', 'Ex.: Frota, Oficina X')}
@@ -407,20 +414,22 @@ function EditorPendencia({ p, onFechar, onMudou, onMover }: { p: Pendencia; onFe
             Início {dataBR(p.inicio)}
             {p.fim ? ` · concluída ${dataBR(p.fim)}` : ''}
           </div>
-        </div>
+        </fieldset>
         {erro && <Aviso tom="destructive">{erro}</Aviso>}
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={onFechar}>
             Fechar
           </Button>
-          <Button onClick={salvar} loading={salvando}>
-            Salvar 5W2H
-          </Button>
+          {edita && (
+            <Button onClick={salvar} loading={salvando}>
+              Salvar 5W2H
+            </Button>
+          )}
         </div>
 
         <div className="flex flex-col gap-2 border-t border-border pt-4">
           <h3 className="eyebrow">Acompanhamento</h3>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-[150px_1fr_auto]">
+          {edita && <div className="grid grid-cols-1 gap-2 sm:grid-cols-[150px_1fr_auto]">
             <Select value={notaTipo} onChange={(e) => setNotaTipo(e.target.value as NotaTipo)}>
               {(Object.keys(NOTA_LABEL) as NotaTipo[]).map((t) => (
                 <option key={t} value={t}>
@@ -432,7 +441,7 @@ function EditorPendencia({ p, onFechar, onMudou, onMover }: { p: Pendencia; onFe
             <Button variant="outline" onClick={registrarNota} disabled={!notaTexto.trim()}>
               Registrar
             </Button>
-          </div>
+          </div>}
           <ul className="flex flex-col">
             {eventos
               .slice()

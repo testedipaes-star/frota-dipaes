@@ -12,7 +12,8 @@ Vite + React + TypeScript + Tailwind v4 + lucide-react (PWA instalável), Supaba
 
 - `supabase/migrations/` — schema, 111 itens da planilha (41 baú, 44 frigorífico, 26 leve), regras de acesso (RLS) e funções.
 - `supabase/tests/envio.sql` — 14 testes de aceite do banco. Termina com um erro proposital que desfaz os dados; a mensagem esperada é `RESULTADO 14 de 14 ok`.
-- `supabase/functions/admin-usuarios` — gera login e senha provisória (só administrador).
+- `supabase/tests/gestor.sql` — 9 testes do perfil Gestor e do cadastro pela Frota (`RESULTADO 9 de 9 ok`).
+- `supabase/functions/admin-usuarios` — gera login e senha provisória (administrador: qualquer perfil; Frota: motoristas).
 - `scripts/gerar_itens.py` — gera a carga de itens a partir da aba Itens da planilha.
 
 ### Regras (todas no banco, função `enviar_checklist`)
@@ -39,7 +40,12 @@ npm run build:previa  # prévia em um único HTML, com dados de exemplo
 
 - Login por CPF: o app converte o CPF em `<cpf>@frota.local` no Supabase Auth. O administrador inicial entra com o login `admin`.
 - Motorista: tela "Novo checklist" → veículo → saída, itens, fotos → resultado. Rascunho e fila de envio ficam no celular (IndexedDB): sem internet, o checklist é enviado sozinho depois.
-- Frota e administrador: Hoje (liberação), Pendências (quadro e tabela 5W2H, Exportar Excel), Histórico, Veículos, Itens; Usuários só para o administrador.
+- Perfis:
+  - **Motorista**: faz o checklist no celular.
+  - **Frota**: Hoje (liberação), Pendências (quadro, tabela 5W2H, Exportar Excel), Histórico, Veículos, Itens e Usuários (cadastra e gera acesso só de motoristas).
+  - **Gestor**: acompanha Hoje, Pendências, Histórico e exporta o 5W2H. Não altera nada (garantido pelo banco).
+  - **Administrador**: tudo da Frota, mais cadastro de Frota, gestores e administradores.
+- Usuários: "Cadastrar vários" aceita uma lista colada do Excel (nome e CPF) e já gera os acessos, com mensagem pronta para o WhatsApp.
 - Contingência: "Lançar folha de papel" na tela Hoje.
 
 ### Publicação (Cloudflare)

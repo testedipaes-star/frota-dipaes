@@ -19,9 +19,9 @@ const ITENS: ItemMenu[] = [
   { para: '/hoje', rotulo: 'Hoje', icone: LayoutDashboard },
   { para: '/pendencias', rotulo: 'Pendências', icone: ClipboardList },
   { para: '/historico', rotulo: 'Histórico', icone: History },
-  { para: '/veiculos', rotulo: 'Veículos', icone: Truck },
-  { para: '/itens', rotulo: 'Itens do checklist', curto: 'Itens', icone: ListChecks },
-  { para: '/usuarios', rotulo: 'Usuários', icone: Users, perfis: ['admin'] },
+  { para: '/veiculos', rotulo: 'Veículos', icone: Truck, perfis: ['frota', 'admin'] },
+  { para: '/itens', rotulo: 'Itens do checklist', curto: 'Itens', icone: ListChecks, perfis: ['frota', 'admin'] },
+  { para: '/usuarios', rotulo: 'Usuários', icone: Users, perfis: ['frota', 'admin'] },
 ]
 
 export default function AppLayout() {

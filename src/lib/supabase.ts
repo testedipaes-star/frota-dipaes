@@ -10,11 +10,11 @@ export const supabase = createClient(url, key, {
   auth: { persistSession: !PREVIA, autoRefreshToken: !PREVIA },
 })
 
-export type PerfilDemo = 'motorista' | 'frota'
+export type PerfilDemo = 'motorista' | 'frota' | 'gestor'
 
 /**
  * Modo demonstração: na prévia, o perfil escolhido no login; em desenvolvimento,
- * ?demo=motorista ou ?demo=frota na URL. Nunca ativo no build de produção.
+ * ?demo=motorista, ?demo=frota ou ?demo=gestor na URL. Nunca ativo no build de produção.
  */
 let atual: PerfilDemo | null = null
 function lerInicial(): PerfilDemo | null {
@@ -23,9 +23,9 @@ function lerInicial(): PerfilDemo | null {
   try {
     if (p) sessionStorage.setItem('demo', p)
     const v = p ?? sessionStorage.getItem('demo')
-    return v === 'motorista' || v === 'frota' ? v : null
+    return v === 'motorista' || v === 'frota' || v === 'gestor' ? v : null
   } catch {
-    return p === 'motorista' || p === 'frota' ? p : null
+    return p === 'motorista' || p === 'frota' || p === 'gestor' ? p : null
   }
 }
 atual = lerInicial()

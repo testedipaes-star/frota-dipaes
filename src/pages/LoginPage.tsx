@@ -85,12 +85,15 @@ export default function LoginPage() {
         <div className="mt-6 flex flex-col gap-2 rounded-xl border border-info-border bg-info-bg p-4">
           <p className="text-sm font-semibold text-info">Prévia com dados de exemplo</p>
           <p className="text-xs text-info">Nenhum dado real é usado e nada é salvo. Escolha como entrar:</p>
-          <div className="mt-1 grid grid-cols-2 gap-2">
+          <div className="mt-1 grid grid-cols-3 gap-2">
             <Button type="button" variant="outline" onClick={() => definirDemo('motorista')}>
               Motorista
             </Button>
             <Button type="button" variant="outline" onClick={() => definirDemo('frota')}>
               Frota
+            </Button>
+            <Button type="button" variant="outline" onClick={() => definirDemo('gestor')}>
+              Gestor
             </Button>
           </div>
         </div>
