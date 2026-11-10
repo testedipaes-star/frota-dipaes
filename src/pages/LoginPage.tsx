@@ -61,13 +61,15 @@ export default function LoginPage() {
   return (
     <LoginShell titulo="Bem-vindo" apoio="Entre com seus dados para acessar o sistema.">
       <form onSubmit={enviar} className="flex flex-col gap-4">
-        <Field label="CPF" ajuda="Digite só os números do seu CPF.">
+        <Field label="CPF ou login" ajuda="Funcionários: os números do CPF. Logins de teste: digite a palavra.">
           <Input
             value={login}
             onChange={(e) => setLogin(/[a-z]/i.test(e.target.value) ? e.target.value : formatarCpf(e.target.value))}
-            inputMode="numeric"
+            inputMode="text"
             autoComplete="username"
             autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
             placeholder="000.000.000-00"
           />
         </Field>

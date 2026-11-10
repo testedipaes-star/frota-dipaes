@@ -59,7 +59,7 @@ const real = {
   async entrar(login: string, senha: string) {
     const { error } = await supabase.auth.signInWithPassword({ email: loginParaEmail(login), password: senha })
     if (error) {
-      if (/Invalid login/i.test(error.message)) throw new Error('CPF ou senha incorretos.')
+      if (/Invalid login/i.test(error.message)) throw new Error('Login ou senha incorretos.')
       falha(error)
     }
   },
